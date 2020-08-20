@@ -104,16 +104,7 @@ impl Component for App {
     }
 
     fn view(&self) -> Html {
-        //let items = vec![ItemData { id: 1, name: "oneP".to_string() }, ItemData { id: 2, name: "twoP".to_string() }];
-       // let handle_change_input = self.link.callback(|m: String| -> () {
-       //     AppMsg::InputChange(m);
-       // });
-       // Callback::from(|v| {
-       //     ConsoleService::info(&format!("Parent got InputChange {:?}", v));
-       // });
-       // let handle_change_input = Callback::from(&self.handle_change_input);
-        ConsoleService::info("APP RENDERED");
-
+        let items = self.render_items();
         html! {
             <div
                 id="app"
@@ -130,42 +121,33 @@ impl Component for App {
                         />
                     </header>
                     <List class="todo-list">
-                        {
-                            for self.items.iter().map(|litem| {
-                                ConsoleService::info(&format!("Iter OVER ITEMS {:?}", litem));
-                                let ItemData { name, id } = litem;
-                                html! {
-                                    <ListItem
-                                        id=id class="todo"
-                                        item=name
-                                        handle_remove=self.link.callback(AppMsg::RemoveItem)
-                                    />
-                                }
-                            }).collect::<Vec<Html>>()
-                        }
+                        { items }
                     </List>
                     <footer class="footer">
                         <span class="todo-count">
-                            /* TODO: only count Active */
                             <strong>{ self.items.len() }</strong>
                             { " item(s) left" }
                         </span>
                     </footer>
                 </section>
                 <footer class="info" />
-                <ul>
-                    {
-                        for self.items.iter().map(|litem| {
-                            ConsoleService::info(&format!("Iter OVER ITEMS {:?}", litem));
-                            let ItemData { name, id } = litem;
-                            html! {
-                                <li id=id class="todo">{ name }</li>
-                            }
-                        }).collect::<Vec<Html>>()
-                    }
-                </ul>
             </div>
         }
     }
 }
 
+impl App {
+    fn render_items(&self) -> Vec<Html> {
+        self.items.iter().map(|litem| {
+            ConsoleService::info(&format!("Iter OVER ITEMS {:?}", litem));
+            let ItemData { name, id } = litem;
+            html! {
+                <ListItem
+                    id=id class="todo"
+                    item=name
+                    handle_remove=self.link.callback(AppMsg::RemoveItem)
+                />
+            }
+        }).collect::<Vec<Html>>()
+    }
+}

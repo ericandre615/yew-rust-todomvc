@@ -46,14 +46,14 @@ impl Component for List {
         ConsoleService::info("Change for LIST");
         ConsoleService::info(&format!("Self childs {:?}", self.props));
         ConsoleService::info(&format!("Props Cihlds {:?}", props));
-        true
-        //if self.props.children == props.children {
-        //    ConsoleService::info("CHLDREN DIFFED");
-        //    true
-        //} else {
-        //    ConsoleService::info("CHLD SAME");
-        //    false
-        //}
+        if self.props.children != props.children {
+            ConsoleService::info("CHLDREN DIFFED");
+            self.props = props;
+            true
+        } else {
+            ConsoleService::info("CHLD SAME");
+            false
+        }
     }
 
     fn view(&self) -> Html {
@@ -62,13 +62,7 @@ impl Component for List {
         let children = self.props.children.clone();
         html! {
             <ul class=format!("list {}", classes)>
-                {
-                    //for children.iter().map(|item| {
-                    //    ConsoleService::info(&format!("Update Item: {:#?}", item));
-                    //    item
-                    //})
-                    children
-                }
+                { children }
             </ul>
         }
     }
