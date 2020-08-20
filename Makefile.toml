@@ -1,11 +1,11 @@
 [tasks.build]
 command = "wasm-pack"
-args = ["build", "--target", "web", "--out-name", "wasm", "--out-dir", "static"]
+args = ["build", "--target", "web", "--out-name", "wasm", "--out-dir", "static/build"]
 watch = { ignore_pattern = "static/*" }
 
 [tasks.build:dev]
 command = "wasm-pack"
-args = ["build", "--dev", "--target", "web", "--out-name", "wasm", "--out-dir", "static"]
+args = ["build", "--dev", "--target", "web", "--out-name", "wasm", "--out-dir", "static/build"]
 watch = { ignore_pattern = "static/*" }
 
 [tasks.serve]
