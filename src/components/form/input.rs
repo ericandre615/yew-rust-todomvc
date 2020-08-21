@@ -72,7 +72,6 @@ impl Component for Input {
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        // TODO: this works, I guess, but not happy with it
         if self.props.value != props.value {
             self.props.value = props.value.clone();
             self.value = props.value;

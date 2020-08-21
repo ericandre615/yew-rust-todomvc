@@ -54,18 +54,12 @@ impl Component for App {
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        // TODO: fix weirdness with update changes seeming "batched" instead of coming in
-        // on every change (keystroke) and then being empty when enter happens, even though it should have
-        // had several characters by then.. basically you have ot hit ENter twice to get it to add it self.items
+        // TODO: fix weirdness with update changes seeming for Keydown listener (always have to double hit Enter to add item)
         match msg {
             AppMsg::InputChange(input) => {
                 self.current_todo = input;
             },
             AppMsg::RemoveItem(item_id) => {
-                ConsoleService::info(&format!("Removing Item id: {:?}", item_id));
-                // TODO: figure out issue where all the data is correct when removing an item,
-                // but the List renders the children incorrectly and then puts the app in  a state
-                // where you can never remove the "misplaced" item.. is it because retain? try filter? filter_map?
                 self.items.retain(|item| item.id != item_id);
             },
             AppMsg::ToggleComplete((item_id, _)) => {
@@ -105,7 +99,6 @@ impl Component for App {
 
     fn view(&self) -> Html {
         let items = self.render_items();
-        ConsoleService::info(&format!("Rendering Items {:?}", self.items));
         html! {
             <div
                 id="app"
@@ -140,11 +133,12 @@ impl Component for App {
 impl App {
     fn render_items(&self) -> Vec<Html> {
         self.items.iter().map(|litem| {
-            ConsoleService::info(&format!("Iter OVER ITEMS {:?}", litem));
             let ItemData { name, id, complete } = litem;
             html! {
                 <ListItem
-                    id=id class="todo"
+                    key={ *id as i128 }
+                    id=id
+                    class="todo"
                     item=name
                     handle_remove=self.link.callback(AppMsg::RemoveItem)
                     handle_complete=self.link.callback(AppMsg::ToggleComplete)
