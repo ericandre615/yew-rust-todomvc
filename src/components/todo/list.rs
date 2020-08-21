@@ -7,7 +7,6 @@ use yew::prelude::{
     Properties,
     Children,
 };
-//use yew::html::ChildrenRenderer;
 use yew::services::ConsoleService;
 
 use crate::components::todo::ListItem;
@@ -15,7 +14,7 @@ use crate::components::todo::ListItem;
 #[derive(Properties, Clone, PartialEq, Debug)]
 pub struct ListProps {
     #[prop_or_default]
-    pub children: Children,//ChildrenRenderer<ListItem>,//Children,
+    pub children: Children, //TODO: check nested_html!? for restricting the type of a Child//ChildrenRenderer<ListItem>,//Children,
     #[prop_or(String::new())]
     pub class: String,
 }
@@ -43,23 +42,19 @@ impl Component for List {
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        ConsoleService::info("Change for LIST");
-        ConsoleService::info(&format!("Self childs {:?}", self.props));
-        ConsoleService::info(&format!("Props Cihlds {:?}", props));
-        if self.props.children != props.children {
-            ConsoleService::info("CHLDREN DIFFED");
-            self.props = props;
+        if self.props != props {
+            // TODO: try yewtils neq_assign
+            self.props = props; // this is key to updating props that are passed into a component
             true
         } else {
-            ConsoleService::info("CHLD SAME");
             false
         }
     }
 
     fn view(&self) -> Html {
-        ConsoleService::info(&format!("LIST RENDERING CHLIDREN {:?}", self.props.children));
         let classes = self.props.class.clone();
         let children = self.props.children.clone();
+
         html! {
             <ul class=format!("list {}", classes)>
                 { children }

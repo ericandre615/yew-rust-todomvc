@@ -15,6 +15,8 @@ pub struct InputProps {
     #[prop_or(String::new())]
     pub initial_value: String,
     #[prop_or(String::new())]
+    pub value: String,
+    #[prop_or(String::new())]
     pub label: String,
     #[prop_or(String::new())]
     pub placeholder: String,
@@ -40,7 +42,12 @@ impl Component for Input {
     type Properties = InputProps;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let value = props.initial_value.clone();
+        let value = if !props.value.is_empty() {
+            props.value.clone()
+        } else {
+            props.initial_value.clone()
+        };
+
         Self {
             link,
             props,
@@ -65,8 +72,10 @@ impl Component for Input {
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        if self.props.initial_value != self.props.initial_value {
-            ConsoleService::info("Initial Valkue changed");
+        // TODO: this works, I guess, but not happy with it
+        if self.props.value != props.value {
+            self.props.value = props.value.clone();
+            self.value = props.value;
             true
         } else {
             false

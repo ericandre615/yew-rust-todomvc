@@ -21,6 +21,8 @@ pub struct ListItemProps {
     pub class: String,
     #[prop_or(Callback::noop())]
     pub handle_remove: Callback<u32>,
+    #[prop_or(Callback::noop())]
+    pub handle_complete: Callback<(u32, bool)>,
 }
 
 pub struct ListItem {
@@ -51,8 +53,10 @@ impl Component for ListItem {
         match msg {
             Msg::ToggleComplete(complete) => {
                 self.completed = complete;
+                self.props.handle_complete.emit((self.props.id, self.completed));
             },
             Msg::Clicked(clicked) => {
+                ConsoleService::info(&format!("Schedule remove for {:?}", self.props.id));
                 self.props.handle_remove.emit(self.props.id);
             },
         }

@@ -15,7 +15,8 @@ use crate::components::todo::{List, ListItem};
 #[derive(Debug)]
 struct ItemData {
     pub id: u32,
-    pub name: String
+    pub name: String,
+    pub complete: bool,
 }
 
 pub struct App {
@@ -30,6 +31,7 @@ pub enum AppMsg {
     Keydown(u32),
     InputChange(String),
     RemoveItem(u32),
+    ToggleComplete((u32, bool)),
 }
 
 pub enum Keycode {
@@ -45,12 +47,9 @@ impl Component for App {
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         Self {
             link,
-            items: vec![
-                ItemData { id: 0, name: "Test Todo".to_string() },
-                ItemData { id: 99, name: "Second Test Todo".to_string() },
-            ],
+            items: Vec::new(),
             current_todo: String::new(),
-            internal_id: 1,
+            internal_id: 0,
         }
     }
 
@@ -60,34 +59,37 @@ impl Component for App {
         // had several characters by then.. basically you have ot hit ENter twice to get it to add it self.items
         match msg {
             AppMsg::InputChange(input) => {
-                ConsoleService::info(&format!("Child Input Changed: {:?}", input));
                 self.current_todo = input;
             },
             AppMsg::RemoveItem(item_id) => {
-                ConsoleService::info(&format!("REmpove item {:?}", item_id));
+                ConsoleService::info(&format!("Removing Item id: {:?}", item_id));
+                // TODO: figure out issue where all the data is correct when removing an item,
+                // but the List renders the children incorrectly and then puts the app in  a state
+                // where you can never remove the "misplaced" item.. is it because retain? try filter? filter_map?
                 self.items.retain(|item| item.id != item_id);
             },
+            AppMsg::ToggleComplete((item_id, _)) => {
+                for item in &mut self.items {
+                    if item.id == item_id {
+                        item.complete = !item.complete;
+                    }
+                }
+            },
             AppMsg::Keydown(keycode) => {
-                ConsoleService::info(&format!("Key Press {:?}", keycode));
                 match keycode {
                     _ if is_keycode(keycode, Keycode::Enter) => {
-                        ConsoleService::info("Enter Key was pressed");
-                        // okay, worked! now we need to take the input value
-                        // and add it to items list
                         let name = self.current_todo.clone();
                         self.current_todo = String::new();
-                        ConsoleService::info(&format!("ITEMVAL {:?}", name));
-                        ConsoleService::info(&format!("ITEMSNBeORE {:?}", self.items));
+
                         if !name.is_empty() {
                             self.items.push(ItemData {
                                 id: self.internal_id,
                                 name,
+                                complete: false,
                             });
 
                             self.internal_id += 1;
                         }
-
-                        ConsoleService::info(&format!("ITEMAFTER {:?}", self.items));
                     },
                     _ => {}
                 }
@@ -98,13 +100,12 @@ impl Component for App {
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        // only if props change, no props so example always false
-        println!("Change was called with Props {:?}", props);
         false
     }
 
     fn view(&self) -> Html {
         let items = self.render_items();
+        ConsoleService::info(&format!("Rendering Items {:?}", self.items));
         html! {
             <div
                 id="app"
@@ -115,7 +116,7 @@ impl Component for App {
                     <header class="header">
                         <h1>{ "todos" }</h1>
                         <Input class="new-todo"
-                            initial_value=self.current_todo.clone()
+                            value=self.current_todo.clone()
                             placeholder="What needs to be done?"
                             handle_change=self.link.callback(AppMsg::InputChange)
                         />
@@ -140,12 +141,13 @@ impl App {
     fn render_items(&self) -> Vec<Html> {
         self.items.iter().map(|litem| {
             ConsoleService::info(&format!("Iter OVER ITEMS {:?}", litem));
-            let ItemData { name, id } = litem;
+            let ItemData { name, id, complete } = litem;
             html! {
                 <ListItem
                     id=id class="todo"
                     item=name
                     handle_remove=self.link.callback(AppMsg::RemoveItem)
+                    handle_complete=self.link.callback(AppMsg::ToggleComplete)
                 />
             }
         }).collect::<Vec<Html>>()
