@@ -11,7 +11,7 @@ use yew::services::ConsoleService;
 use crate::components::Button;
 use crate::components::form::Checkbox;
 
-#[derive(Properties, Clone, Debug)]
+#[derive(Properties, Clone, PartialEq, Debug)]
 pub struct ListItemProps {
     #[prop_or(0)]
     pub id: u32,
@@ -56,7 +56,6 @@ impl Component for ListItem {
                 self.props.handle_complete.emit((self.props.id, self.completed));
             },
             Msg::Clicked(clicked) => {
-                ConsoleService::info(&format!("Schedule remove for {:?}", self.props.id));
                 self.props.handle_remove.emit(self.props.id);
             },
         }
@@ -64,7 +63,12 @@ impl Component for ListItem {
     }
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        false
+        if self.props != props {
+            self.props = props;
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self) -> Html {
