@@ -5,6 +5,8 @@ use yew;
 
 mod app;
 mod components;
+mod views;
+mod routes;
 
 #[wasm_bindgen(start)]
 pub fn run_app() -> Result<(), JsValue> {

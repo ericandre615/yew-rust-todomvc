@@ -1,12 +1,13 @@
 {
   "name": "rust-yew-todo",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Demo of a todoMVC app in Rust with Yew framework",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "wasm-pack build --target web --out-name wasm --out-dir ./static/build",
-    "start": "npx serve ./static"
+    "start": "webpack-dev-server",
+    "start:dev": "webpack-dev-server"
   },
   "keywords": [
     "Rust",
@@ -15,5 +16,10 @@
     "MVC"
   ],
   "author": "Eric Andre",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  }
 }
