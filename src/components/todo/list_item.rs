@@ -17,22 +17,23 @@ pub struct ListItemProps {
     pub id: u32,
     #[prop_or(String::new())]
     pub item: String,
+    #[prop_or(false)]
+    pub complete: bool,
     #[prop_or(String::new())]
     pub class: String,
     #[prop_or(Callback::noop())]
     pub handle_remove: Callback<u32>,
     #[prop_or(Callback::noop())]
-    pub handle_complete: Callback<(u32, bool)>,
+    pub handle_complete: Callback<u32>,
 }
 
 pub struct ListItem {
     link: ComponentLink<Self>,
     props: ListItemProps,
-    completed: bool,
 }
 
 pub enum Msg {
-    ToggleComplete(bool),
+    ToggleComplete,
     Clicked(bool),
 }
 
@@ -45,15 +46,13 @@ impl Component for ListItem {
         Self {
             link,
             props,
-            completed: false,
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
-            Msg::ToggleComplete(complete) => {
-                self.completed = complete;
-                self.props.handle_complete.emit((self.props.id, self.completed));
+            Msg::ToggleComplete => {
+                self.props.handle_complete.emit(self.props.id);
             },
             Msg::Clicked(clicked) => {
                 self.props.handle_remove.emit(self.props.id);
@@ -75,7 +74,7 @@ impl Component for ListItem {
         let id = self.props.id;
         let item = self.props.item.clone();
         let classes = self.props.class.clone();
-        let completed = if self.completed { "completed" } else { "" };
+        let completed = if self.props.complete { "completed" } else { "" };
 
         html! {
             <li class=format!("list-item {} {}", classes, completed)>
@@ -83,7 +82,8 @@ impl Component for ListItem {
                     <Checkbox
                         class="toggle"
                         value=item.clone()
-                        handle_change=self.link.callback(Msg::ToggleComplete)
+                        checked=self.props.complete
+                        handle_change=self.link.callback(|_| Msg::ToggleComplete)
                     />
 
                     <label><span class="list-name">{ item }</span></label>

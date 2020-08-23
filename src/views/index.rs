@@ -9,19 +9,15 @@ use yew::prelude::{
     Properties,
 };
 use yew::services::ConsoleService;
+use serde::{Serialize, Deserialize};
+use serde_json::{Value};
 
 use crate::components::form::Input;
 use crate::components::todo::{List, ListItem};
 use crate::app::{AppFilter};
+use crate::api::session;
 
-//#[derive(Debug, Clone)]
-//pub enum AppFilter {
-//    Active,
-//    Complete,
-//    All,
-//}
-
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 struct ItemData {
     pub id: u32,
     pub name: String,
@@ -46,7 +42,7 @@ pub enum AppMsg {
     Keydown(u32),
     InputChange(String),
     RemoveItem(u32),
-    ToggleComplete((u32, bool)),
+    ToggleComplete(u32),
 }
 
 pub enum Keycode {
@@ -60,9 +56,11 @@ impl Component for Index {
     type Properties = IndexProps;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+        let storage = session::get_session(&"items").unwrap();
+        let items: Vec<ItemData> = serde_json::from_value(storage).unwrap_or(Vec::new());
         Self {
             link,
-            items: Vec::new(),
+            items,
             current_todo: String::new(),
             internal_id: 0,
             props,
@@ -77,13 +75,16 @@ impl Component for Index {
             },
             AppMsg::RemoveItem(item_id) => {
                 self.items.retain(|item| item.id != item_id);
+                self.store_items();
             },
-            AppMsg::ToggleComplete((item_id, _)) => {
+            AppMsg::ToggleComplete(item_id) => {
                 for item in &mut self.items {
                     if item.id == item_id {
                         item.complete = !item.complete;
                     }
                 }
+
+                self.store_items();
             },
             AppMsg::Keydown(keycode) => {
                 match keycode {
@@ -99,6 +100,7 @@ impl Component for Index {
                             });
 
                             self.internal_id += 1;
+                            self.store_items();
                         }
                     },
                     _ => {}
@@ -144,6 +146,23 @@ impl Component for Index {
 }
 
 impl Index {
+    // TODO: this is where having a single top level store/state like redux works really well
+    // then you can just subscribe and update/hydrate from sessionStorage in one single place at the root/top level of the app
+    // explore more options
+    fn store_items(&self) {
+        let json = serde_json::to_string(&self.items);
+
+        match json {
+            Ok(json_str) => {
+                session::set_session(
+                    &"items",
+                    &json_str,
+                );
+            },
+            Err(e) => {},
+        }
+    }
+
     fn render_items(&self, filter: &AppFilter) -> Vec<Html> {
         self.items.iter()
         .filter(|item| {
@@ -161,6 +180,7 @@ impl Index {
                     id=id
                     class="todo"
                     item=name
+                    complete=complete
                     handle_remove=self.link.callback(AppMsg::RemoveItem)
                     handle_complete=self.link.callback(AppMsg::ToggleComplete)
                 />

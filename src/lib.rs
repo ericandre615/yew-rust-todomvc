@@ -7,6 +7,7 @@ mod app;
 mod components;
 mod views;
 mod routes;
+mod api;
 
 #[wasm_bindgen(start)]
 pub fn run_app() -> Result<(), JsValue> {
