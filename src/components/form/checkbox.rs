@@ -11,7 +11,7 @@ use yew::prelude::{
 };
 use yew::services::ConsoleService;
 
-#[derive(Properties, Clone)]
+#[derive(Properties, Clone, PartialEq)]
 pub struct CheckboxProps {
     #[prop_or(String::new())]
     pub value: String,
@@ -60,9 +60,13 @@ impl Component for Checkbox {
         true
     }
 
-    fn change(&mut self, _props: Self::Properties) -> ShouldRender {
-        // only if props change, no props so example always false
-        false
+    fn change(&mut self, props: Self::Properties) -> ShouldRender {
+        if self.props != props {
+            self.props = props;
+            true
+        } else {
+            false
+        }
     }
 
     fn view(&self) -> Html {
