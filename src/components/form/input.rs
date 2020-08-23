@@ -5,7 +5,7 @@ use yew::prelude::{
     html,
     ShouldRender,
     Properties,
-    ChangeData,
+    InputData,
     Callback,
 };
 use yew::services::ConsoleService;
@@ -33,7 +33,7 @@ pub struct Input {
 }
 
 pub enum Msg {
-    UpdateValue(ChangeData),
+    UpdateValue(InputData),
 }
 
 
@@ -58,13 +58,8 @@ impl Component for Input {
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::UpdateValue(change) => {
-                match change {
-                    ChangeData::Value(value) => {
-                        self.value = value.clone();
-                        self.props.handle_change.emit(self.value.clone());
-                    },
-                    _ => {}
-                }
+                self.value = change.value.clone();
+                self.props.handle_change.emit(self.value.clone());
             },
         }
 
@@ -92,7 +87,7 @@ impl Component for Input {
                 <input
                     type="text"
                     class=classes
-                    onchange=self.link.callback(|v: ChangeData| Msg::UpdateValue(v))
+                    oninput=self.link.callback(|v: InputData| Msg::UpdateValue(v))
                     value={ self.value.clone() }
                     placeholder={ placeholder }
                 />
