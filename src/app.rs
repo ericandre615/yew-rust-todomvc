@@ -31,8 +31,9 @@ impl Component for App {
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         Self {
             link,
-            item_count: 0, // okay, now need to get the item_count from the list component... wamp wamp
-        }
+            // TODO: need to get the item_count from the list component. Could get it from session_storage, but don't think that's a good solution
+            // being able to get it from the app component or some other state store in app outside of browser api is better
+            item_count: 0,         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
