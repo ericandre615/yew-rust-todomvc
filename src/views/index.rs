@@ -8,7 +8,6 @@ use yew::prelude::{
     Callback,
     Properties,
 };
-use yew::services::ConsoleService;
 use serde::{Serialize, Deserialize};
 use serde_json::{Value};
 
@@ -17,7 +16,7 @@ use crate::components::todo::{List, ListItem};
 use crate::app::{AppFilter};
 use crate::api::session;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq)]
 struct ItemData {
     pub id: u32,
     pub name: String,
@@ -39,7 +38,7 @@ pub struct Index {
 
 #[derive(Debug)]
 pub enum AppMsg {
-    Keydown(u32),
+    Keypress(u32),
     InputChange(String),
     RemoveItem(u32),
     ToggleComplete(u32),
@@ -58,11 +57,13 @@ impl Component for Index {
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let storage = session::get_session(&"items").unwrap();
         let items: Vec<ItemData> = serde_json::from_value(storage).unwrap_or(Vec::new());
+        let last_id = Index::get_last_id(&items);
+
         Self {
             link,
             items,
             current_todo: String::new(),
-            internal_id: 0,
+            internal_id: last_id,
             props,
         }
     }
@@ -86,7 +87,7 @@ impl Component for Index {
 
                 self.store_items();
             },
-            AppMsg::Keydown(keycode) => {
+            AppMsg::Keypress(keycode) => {
                 match keycode {
                     _ if is_keycode(keycode, Keycode::Enter) => {
                         let name = self.current_todo.clone();
@@ -126,7 +127,7 @@ impl Component for Index {
             <>
                 <header
                     class="header"
-                    onkeydown=self.link.callback(|e: KeyboardEvent| AppMsg::Keydown(e.key_code()))
+                    onkeypress=self.link.callback(|e: KeyboardEvent| AppMsg::Keypress(e.key_code()))
                 >
                     <h1>{ "todos" }</h1>
                     <Input class="new-todo"
@@ -163,28 +164,41 @@ impl Index {
         }
     }
 
+    fn get_last_id(items: &Vec<ItemData>) -> u32 {
+        let max_item = items.iter().max();
+
+        match max_item {
+            Some(max) => {
+                max.id + 1
+            },
+            None => {
+                0
+            },
+        }
+    }
+
     fn render_items(&self, filter: &AppFilter) -> Vec<Html> {
         self.items.iter()
-        .filter(|item| {
-            match filter {
-                AppFilter::Active => !item.complete,
-                AppFilter::Complete => item.complete,
-                AppFilter::All => true,
-            }
-        })
-        .map(|litem| {
-            let ItemData { name, id, complete } = litem;
-            html! {
-                <ListItem
-                    key={ *id as i128 }
-                    id=id
-                    class="todo"
-                    item=name
-                    complete=complete
-                    handle_remove=self.link.callback(AppMsg::RemoveItem)
-                    handle_complete=self.link.callback(AppMsg::ToggleComplete)
-                />
-            }
-        }).collect::<Vec<Html>>()
+            .filter(|item| {
+                match filter {
+                    AppFilter::Active => !item.complete,
+                    AppFilter::Complete => item.complete,
+                    AppFilter::All => true,
+                }
+            })
+            .map(|litem| {
+                let ItemData { name, id, complete } = litem;
+                html! {
+                    <ListItem
+                        key={ *id as i128 }
+                        id=id
+                        class="todo"
+                        item=name
+                        complete=complete
+                        handle_remove=self.link.callback(AppMsg::RemoveItem)
+                        handle_complete=self.link.callback(AppMsg::ToggleComplete)
+                    />
+                }
+            }).collect::<Vec<Html>>()
     }
 }
