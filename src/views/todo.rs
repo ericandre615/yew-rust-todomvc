@@ -7,6 +7,7 @@ use yew::prelude::{
     Properties,
 };
 use yew::services::ConsoleService;
+use crate::components::transition::Transition;
 
 #[derive(Debug)]
 struct ItemData {
@@ -52,9 +53,11 @@ impl Component for Todo {
     fn view(&self) -> Html {
         let id = self.props.id;
         html! {
-            <p class="todo">
-                { "Render TODO id" } { id }
-            </p>
+            <Transition name="todo">
+                <p class="todo">
+                    { "Render TODO id" } { id }
+                </p>
+            </Transition>
         }
     }
 }
