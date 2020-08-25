@@ -1,0 +1,38 @@
+/*
+.todo-enter {
+    opacity: 0;
+}
+*/
+/* duration must match code passed to component */
+/*
+.todo-entered {
+    opacity: 1;
+    transition: opacity 3000ms ease-in-out; }
+*/
+
+.todo-appear {
+    opacity: 0;
+    /*transition opacity 2000ms ease-in-out;*/
+}
+
+.todo-appearing {
+    opacity: 1;
+    transition: opacity 2000ms ease-in-out;
+}
+
+.todo-appeared {
+    opacity: 1;
+}
+
+.todo-exit {
+    opacity: 1;
+}
+
+.todo-exiting {
+    opacity: 0;
+    transition: opacity 4000ms ease-in-out;
+}
+
+.todo-exited {
+    opacity: 0;
+}
