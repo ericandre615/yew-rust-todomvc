@@ -36,3 +36,33 @@
 .todo-exited {
     opacity: 0;
 }
+
+.todo-header-appear {
+    max-height: 0;
+    overflow: hidden;
+}
+
+.todo-header-appearing {
+    max-height: 200px;
+    transition: max-height 600ms ease-in;
+}
+
+.todo-header-appeared {
+    max-height: none;
+    overflow: initial;
+}
+
+.todo-header-enter {
+    max-height: 0;
+    overflow: hidden;
+}
+
+.todo-header-entering {
+    max-height: 200px;
+    transition: max-height 600ms ease-in;
+}
+
+.todo-header-entered {
+    max-height: none;
+    overflow: initial;
+}
