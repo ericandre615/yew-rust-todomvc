@@ -7,7 +7,8 @@ use yew::prelude::{
     Properties,
 };
 use yew::services::ConsoleService;
-use crate::components::transition::CSSTransition;
+//use crate::components::transition::CSSTransition;
+use yewi::components::transition::CSSTransition;
 use std::time::Duration;
 
 #[derive(Debug)]
@@ -58,11 +59,12 @@ impl Component for Todo {
                 name="todo"
                 duration=Duration::from_millis(4000)
                 appear=Duration::from_millis(2000)
-                enter=Duration::from_millis(3000)
             >
-                <p class="todo">
-                    { "Render TODO id" } { id }
-                </p>
+                <div class="todo-view">
+                    <p class="todo">
+                        { "Render TODO id" } { id }
+                    </p>
+                </div>
             </CSSTransition>
         }
     }
