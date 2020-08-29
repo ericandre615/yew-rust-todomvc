@@ -10,11 +10,14 @@ use yew::prelude::{
 };
 use serde::{Serialize, Deserialize};
 use serde_json::{Value};
+use yewi::components::transition::CSSTransition;
 
 use crate::components::form::Input;
 use crate::components::todo::{List, ListItem};
 use crate::app::{AppFilter};
 use crate::api::session;
+
+use std::time::Duration;
 
 #[derive(Debug, Serialize, Deserialize, Ord, PartialOrd, Eq, PartialEq)]
 struct ItemData {
@@ -125,17 +128,22 @@ impl Component for Index {
         let items = self.render_items(&self.props.filter);
         html! {
             <>
-                <header
-                    class="header"
-                    onkeypress=self.link.callback(|e: KeyboardEvent| AppMsg::Keypress(e.key_code()))
+                <CSSTransition
+                    name="todo-header"
+                    duration=Duration::from_millis(600)
                 >
-                    <h1>{ "todos" }</h1>
-                    <Input class="new-todo"
-                        value=self.current_todo.clone()
-                        placeholder="What needs to be done?"
-                        handle_change=self.link.callback(AppMsg::InputChange)
-                    />
-                </header>
+                    <header
+                        class="header"
+                        onkeypress=self.link.callback(|e: KeyboardEvent| AppMsg::Keypress(e.key_code()))
+                    >
+                        <h1>{ "todos" }</h1>
+                        <Input class="new-todo"
+                            value=self.current_todo.clone()
+                            placeholder="What needs to be done?"
+                            handle_change=self.link.callback(AppMsg::InputChange)
+                        />
+                    </header>
+                </CSSTransition>
                 <section class="main">
                     <List class="todo-list">
                         { items }

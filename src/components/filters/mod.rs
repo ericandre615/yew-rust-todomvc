@@ -7,7 +7,12 @@ use yew::prelude::{
     Properties,
     Callback,
 };
-use yew_router::components::{RouterAnchor};
+use yew_router::{
+    components::RouterAnchor,
+    service::RouteService,
+    agent::RouteAgentBridge,
+    route::Route
+};
 use yew::services::ConsoleService;
 
 use crate::app::{AppFilter};
@@ -15,32 +20,44 @@ use crate::routes::{AppRoute};
 
 #[derive(Properties, Clone, PartialEq, Debug)]
 pub struct FiltersProps {
-    #[prop_or(AppFilter::All)]
-    active: AppFilter
 }
 
 pub struct Filters {
     link: ComponentLink<Self>,
     props: FiltersProps,
+    current_route: Route,
+    _route_agent: RouteAgentBridge,
 }
 
 pub enum Msg {
-    RouteChange
+    RouteChange(Route<()>)
 }
 
+type RouteLink = RouterAnchor<AppRoute>;
 
 impl Component for Filters {
     type Message = Msg;
     type Properties = FiltersProps;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+        let update_route = link.callback(Msg::RouteChange);
+        let route_agent = RouteAgentBridge::new(update_route);
+        let current_route = RouteService::new().get_route();
+
         Self {
             link,
             props,
+            current_route,
+            _route_agent: route_agent,
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
+        match msg {
+            Msg::RouteChange(route) => {
+                self.current_route = route;
+            },
+        }
         true
     }
 
@@ -54,13 +71,23 @@ impl Component for Filters {
     }
 
     fn view(&self) -> Html {
-        let active = self.props.active;
+        let current_route = self.current_route.clone();
+
         html! {
             <ul class="filters">
-                <li><RouterAnchor<AppRoute> route=AppRoute::Index>{ "All" }</RouterAnchor<AppRoute>></li>
-                <li><RouterAnchor<AppRoute> route=AppRoute::Active>{ "Active" }</RouterAnchor<AppRoute>></li>
-                <li><RouterAnchor<AppRoute> route=AppRoute::Complete>{ "Complete" }</RouterAnchor<AppRoute>></li>
+                <li><RouteLink route=AppRoute::Index classes=self.active_classname("/")>{ "All" }</RouteLink></li>
+                <li><RouteLink route=AppRoute::Active classes=self.active_classname("/active")>{ "Active" }</RouteLink></li>
+                <li><RouteLink route=AppRoute::Complete classes=self.active_classname("/complete")>{ "Complete" }</RouteLink></li>
             </ul>
+        }
+    }
+}
+
+impl Filters {
+    fn active_classname(&self, route: &str) -> &str {
+        match &self.current_route.route {
+            curr if curr == route => "selected",
+            _ => "not-selected",
         }
     }
 }

@@ -7,9 +7,11 @@ use yew::prelude::{
     Properties,
     Callback,
 };
+use yew_router::components::{RouterAnchor};
 use yew::services::ConsoleService;
 use crate::components::Button;
 use crate::components::form::Checkbox;
+use crate::routes::{AppRoute};
 
 #[derive(Properties, Clone, PartialEq, Debug)]
 pub struct ListItemProps {
@@ -86,7 +88,11 @@ impl Component for ListItem {
                         handle_change=self.link.callback(|_| Msg::ToggleComplete)
                     />
 
-                    <label><span class="list-name">{ item }</span></label>
+                    <label>
+                    <RouterAnchor<AppRoute> route=AppRoute::Todo(id)>
+                        <span class="list-name">{ item }</span>
+                    </RouterAnchor<AppRoute>>
+                    </label>
                     <Button class="destroy" handle_click=self.link.callback(Msg::Clicked) />
                 </div>
             </li>

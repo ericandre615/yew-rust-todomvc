@@ -253,6 +253,24 @@ body {
 	margin-bottom: -1px;
 }
 
+.todo-list li label a {
+    text-decoration: none;
+    color: #4d4d4d;
+}
+
+.todo-list li.completed label a {
+    color: #d9d9d9;
+}
+
+.todo-view {
+    padding: 1em;
+    font-size: 1.5em;
+}
+
+.todo-view p.todo-name {
+    padding: 0;
+}
+
 .footer {
 	color: #777;
 	padding: 10px 15px;
