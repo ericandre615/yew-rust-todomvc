@@ -66,3 +66,18 @@
     max-height: none;
     overflow: initial;
 }
+
+.todo-list-enter li {
+    max-height: 0;
+    overflow: hidden;
+}
+
+.todo-list-entering li {
+    max-height: 200px;
+    transition: max-height 600ms ease-in;
+}
+
+.todo-list-entered li {
+    max-height: none;
+    overflow: initial;
+}

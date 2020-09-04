@@ -9,7 +9,10 @@ use yew::prelude::{
 };
 use yew::services::ConsoleService;
 
+use yewi::components::transition::CSSTransition;
 use crate::components::todo::ListItem;
+
+use std::time::Duration;
 
 #[derive(Properties, Clone, PartialEq, Debug)]
 pub struct ListProps {
@@ -57,7 +60,12 @@ impl Component for List {
 
         html! {
             <ul class=format!("list {}", classes)>
-                { children }
+                <CSSTransition
+                    name="todo-list"
+                    enter=Duration::from_millis(600)
+                >
+                    { children }
+                </CSSTransition>
             </ul>
         }
     }

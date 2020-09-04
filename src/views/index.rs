@@ -155,9 +155,7 @@ impl Component for Index {
 }
 
 impl Index {
-    // TODO: this is where having a single top level store/state like redux works really well
-    // then you can just subscribe and update/hydrate from sessionStorage in one single place at the root/top level of the app
-    // explore more options
+    // TODO: temp solution, look into Services/Agents
     fn store_items(&self) {
         let json = serde_json::to_string(&self.items);
 
