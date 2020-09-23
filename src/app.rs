@@ -11,6 +11,7 @@ use yew::services::ConsoleService;
 
 use crate::routes::router;
 use crate::components::Filters;
+use crate::components::buttons::github::FollowButton;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub enum AppFilter {
@@ -58,6 +59,7 @@ impl Component for App {
                 </footer>
                 </section>
                 <footer class="info" />
+                <FollowButton />
             </div>
         }
     }
